@@ -1,13 +1,19 @@
 local M = {}
 
 function M.wrap_file_command(cmd, args, file_path)
+    local command = M.wrap_command(cmd, args)
+    table.insert(command, file_path)
+    return command
+end
+
+function M.wrap_command(cmd, args)
     local command = { cmd }
     if #args > 0 then
         for _, arg in ipairs(args) do
             table.insert(command, arg)
         end
     end
-    table.insert(command, file_path)
+    table.insert(command)
     return command
 end
 
