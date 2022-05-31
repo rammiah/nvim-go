@@ -17,9 +17,10 @@ local function get_timeout(level)
     if config.options.notify_config.timeout ~= nil then
         timeout = config.options.notify_config.timeout
     end
-    if config.options.notify_config[level..'timeout'] ~= nil then
-        timeout = config.options.notify_config[level..'timeout']
+    if config.options.notify_config[level..'_timeout'] ~= nil then
+        timeout = config.options.notify_config[level..'_timeout']
     end
+    -- print('timeout for '..level..' is '..tostring(timeout))
     return timeout
 end
 
