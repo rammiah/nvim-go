@@ -12,9 +12,21 @@ local function should_notify()
     return false
 end
 
+local function get_timeout(level)
+    local timeout = 3000
+    if config.options.notify_config.timeout ~= nil then
+        timeout = config.options.notify_config.timeout
+    end
+    if config.options.notify_config[level..'timeout'] ~= nil then
+        timeout = config.options.notify_config[level..'timeout']
+    end
+    return timeout
+end
+
 function M.show_info(prefix, msg)
     if should_notify() then
-        notify(msg, 'info', { title = prefix })
+        local timeout = config.options.notify_config.timeout
+        notify(msg, 'info', { title = prefix, timeout = get_timeout('info') })
     else
         vim.api.nvim_echo({ { prefix }, { ' ' .. msg } }, true, {})
     end
@@ -26,7 +38,7 @@ function M.show_success(prefix, msg)
         succ = msg
     end
     if should_notify() then
-        notify(msg, 'info', { title = prefix })
+        notify(msg, 'info', { title = prefix , timeout = get_timeout('info') })
     else
         vim.api.nvim_echo({ { prefix, 'Function' }, { ' ' .. succ } }, true, {})
     end
@@ -34,7 +46,7 @@ end
 
 function M.show_error(prefix, msg)
     if should_notify() then
-        notify(msg, 'error', { title = prefix })
+        notify(msg, 'error', { title = prefix, timeout = get_timeout('error') })
     else
         vim.api.nvim_echo({ { prefix, 'ErrorMsg' }, { ' ' .. msg } }, true, {})
     end
@@ -42,7 +54,7 @@ end
 
 function M.show_warning(prefix, msg)
     if should_notify() then
-        notify(msg, 'warn', { title = prefix })
+        notify(msg, 'warn', { title = prefix, timeout = get_timeout('warn') })
     else
         vim.api.nvim_echo(
             { { prefix, 'WarningMsg' }, { ' ' .. msg } },

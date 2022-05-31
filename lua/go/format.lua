@@ -23,35 +23,14 @@ local function do_fmt(formatter, args)
     end
     local buf_nr = vim.api.nvim_get_current_buf()
     local content = vim.api.nvim_buf_get_lines(buf_nr, 0, -1, true)
-    local view = vim.fn.winsaveview()
     -- goimports stdout result
-    local result = {}
-    local cmd = system.wrap_command(formatter, args)
-    local id = vim.fn.jobstart({cmd}, {
-        on_exit = function(_, code, _)
-            if code == 0 then
-                output.show_success('GoFormat', 'Success')
-                -- set out lines
-                vim.api.nvim_buf_set_lines(buf_nr, 0, -1, true, result)
-                vim.fn.winrestview(view)
-            end
-            vim.api.nvim_exec('noautocmd write', true)
-        end,
-        on_stderr = function(_, data, _)
-            if #data == 0 or #data[1] == 0 then
-                return
-            end
-            local results = 'File is not formatted due to error.\n'
-                .. table.concat(data, '\n')
-            output.show_error('GoFormat', results)
-        end,
-        stdout_buffered = true, -- goimports output
-        on_stdout = function (_, data, _)
-            result = data
-        end,
-    })
-    vim.fn.chansend(id, content)
-    vim.fn.chanclose(id, 'stdin')
+    local result = vim.fn.systemlist(system.wrap_command(formatter, args), content)
+    if vim.v.shell_error == 0 then
+        vim.api.nvim_buf_set_lines(buf_nr, 0, -1, true, result)
+        output.show_success('GoFormat', 'Success')
+    else
+        output.show_error('GoFormat', 'error '..table.concat(result, '\n'))
+    end
 end
 
 function M.gofmt()
@@ -59,7 +38,7 @@ function M.gofmt()
 end
 
 function M.goimports()
-    do_fmt('goimports', {})
+    do_fmt('goimports', { })
 end
 
 function M.gofumpt()
