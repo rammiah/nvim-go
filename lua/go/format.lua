@@ -20,6 +20,13 @@ local function do_fmt(formatter, args)
     if not util.binary_exists(formatter) then
         return
     end
+    if _M and _M.OrganizeImports then
+        _M.OrganizeImports()
+        if formatter == "goimports" then
+            table.insert(args, "-format-only")
+        end
+    end
+
     local buf_nr = vim.api.nvim_get_current_buf()
     local content = vim.api.nvim_buf_get_lines(buf_nr, 0, -1, true)
     -- goimports stdout result
