@@ -98,6 +98,10 @@ local function modify_tags(prefix, args)
             end
         end,
         on_stderr = function(_, data, _)
+            if #data == 1 and data[1] == "" then
+                -- there is no error
+                return
+            end
             local results = table.concat(data, '\n')
             output.show_error(prefix, results)
         end,
