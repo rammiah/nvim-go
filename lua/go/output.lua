@@ -164,6 +164,13 @@ function M.popup_job_result(results, opts)
     })
     vim.api.nvim_win_set_option(popup_win, 'wrap', false)
     vim.api.nvim_buf_set_option(buf_nr, 'modifiable', false)
+    vim.api.nvim_buf_set_keymap(
+        buf_nr,
+        'n',
+        'q',
+        ':q!<cr>',
+        { noremap = true, silent = true }
+    )
     local popup_bufnr = buf_nr
     local border_bufnr = popup_opts.border and popup_opts.border.bufnr
     local border_win = popup_opts.border and popup_opts.border.win_id
@@ -176,18 +183,18 @@ function M.popup_job_result(results, opts)
     end
 
     if config.options.test_popup_auto_leave then
-        local on_buf_leave = string.format(
-            [[  autocmd BufLeave <buffer> ++nested ++once :silent lua require('go.output').close_popups(%s,%s,%s,%s)]],
-            popup_win,
-            popup_bufnr,
-            border_win,
-            border_bufnr
+        local group = vim.api.nvim_create_augroup(
+            'NvimGoInternal',
+            { clear = true }
         )
-
-        vim.cmd([[augroup NvimGoInternal]])
-        vim.cmd([[  autocmd!]])
-        vim.cmd(on_buf_leave)
-        vim.cmd([[augroup END]])
+        vim.api.nvim_create_autocmd({ 'BufLeave' }, {
+            group = group,
+            pattern = { '<buffer>' },
+            once = true,
+            callback = function(_)
+                M.close_popups(popup_win, popup_bufnr, border_win, border_bufnr)
+            end,
+        })
     end
 end
 
