@@ -14,6 +14,7 @@ M.options = {
     lint_prompt_style = 'qf',
     -- formatter: goimports, gofmt, gofumpt
     formatter = 'goimports',
+    format_organize = false,
     -- test flags: -count=1 will disable cache
     test_flags = { '-v' },
     test_timeout = '30s',

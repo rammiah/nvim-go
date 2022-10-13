@@ -20,11 +20,13 @@ local function do_fmt(formatter, args)
     if not util.binary_exists(formatter) then
         return
     end
-    if _M and _M.OrganizeImports then
-        _M.OrganizeImports()
-        if formatter == "goimports" then
+    if config.format_organize then
+        if _M and _M.OrganizeImports then
+            _M.OrganizeImports()
             table.insert(args, "-format-only")
         end
+    else
+        table.insert(args, "-format-only")
     end
 
     local buf_nr = vim.api.nvim_get_current_buf()
@@ -44,7 +46,7 @@ function M.gofmt()
 end
 
 function M.goimports()
-    do_fmt("goimports", { "-d" })
+    do_fmt("goimports", { "-d", })
 end
 
 function M.gofumpt()
